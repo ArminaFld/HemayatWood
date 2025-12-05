@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import VerifyPage from './pages/VerifyPage';
+import HomePage from './pages/HomePage';
+
+// روت محافظت‌شده: اگر توکن نداشت، اجازه نمی‌دهد صفحه‌ی داخلی را ببینیم
+function PrivateRoute({ children }) {
+  const token = localStorage.getItem('accessToken');
+  return token ? children : <Navigate to="/login" />;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* روت اصلی را به لاگین می‌فرستیم */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify" element={<VerifyPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* /home فقط وقتی توکن داریم قابل دسترسی است */}
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <HomePage />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
