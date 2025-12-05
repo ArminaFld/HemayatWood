@@ -12,7 +12,6 @@ function LoginPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ارسال درخواست لاگین
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);

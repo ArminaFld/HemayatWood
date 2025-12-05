@@ -10,7 +10,6 @@ import LoginPage from './pages/LoginPage';
 import VerifyPage from './pages/VerifyPage';
 import HomePage from './pages/HomePage';
 
-// روت محافظت‌شده: اگر توکن نداشت، اجازه نمی‌دهد صفحه‌ی داخلی را ببینیم
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('accessToken');
   return token ? children : <Navigate to="/login" />;

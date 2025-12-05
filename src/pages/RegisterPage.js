@@ -13,12 +13,10 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // آپدیت شدن state فرم وقتی کاربر تایپ می‌کند
   const handleChange = e => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ارسال فرم ثبت‌نام به بک‌اند
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
@@ -27,7 +25,6 @@ function RegisterPage() {
     try {
       const res = await api.post('/register', form);
       setMessage(res.data.message || 'ثبت نام انجام شد');
-      // بعد از ثبت‌نام، کاربر را به صفحه وارد کردن کد تأیید می‌بریم
       navigate('/verify', { state: { email: form.email } });
     } catch (err) {
       setMessage(err.response?.data?.message || 'خطا در ثبت نام');

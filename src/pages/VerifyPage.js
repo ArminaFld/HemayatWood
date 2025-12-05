@@ -5,14 +5,12 @@ import api from '../api/client';
 function VerifyPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  // ایمیلی که از صفحه ثبت‌نام فرستادیم، اگر نبود خود کاربر باید بنویسد
   const emailFromState = location.state?.email || '';
   const [email, setEmail] = useState(emailFromState);
   const [code, setCode] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ارسال کد تأیید
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
@@ -21,7 +19,6 @@ function VerifyPage() {
     try {
       const res = await api.post('/verify-email', { email, code });
       setMessage(res.data.message || 'تأیید انجام شد');
-      // اگر بک‌اند توکن برگرداند، ذخیره کن و برو صفحه خانه
       if (res.data.token) {
         localStorage.setItem('accessToken', res.data.token);
         navigate('/home');

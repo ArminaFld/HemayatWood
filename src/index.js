@@ -11,5 +11,4 @@ root.render(
   </React.StrictMode>
 );
 
-// اگر نخواستی از Web Vitals استفاده کنی می‌تونی این خط رو هم پاک کنی
 reportWebVitals();
