@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
+import logo from '../assets/hemayat-logo.png.png';
 
 function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -8,11 +9,11 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = e => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
@@ -32,7 +33,11 @@ function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        {/* 👇 لوگو بالای فرم */}
+        <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
+
         <h1>ورود</h1>
+
         <form onSubmit={handleSubmit}>
           <input
             name="email"

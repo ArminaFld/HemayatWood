@@ -61,3 +61,9 @@ body {
   margin-top: 1rem;
   font-size: 0.9rem;
 }
+
+.auth-logo {
+  display: block;
+  margin: 0 auto 24px;
+  width: 160px;
+}
