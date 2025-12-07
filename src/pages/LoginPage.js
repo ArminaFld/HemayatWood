@@ -30,10 +30,13 @@ function LoginPage() {
     }
   };
 
+  const goToForgotPassword = () => {
+    navigate('/verify');
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-card">
-        {/* 👇 لوگو بالای فرم */}
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
 
         <h1>ورود</h1>
@@ -54,6 +57,14 @@ function LoginPage() {
           />
           <button type="submit" disabled={loading}>
             {loading ? '...' : 'ورود'}
+          </button>
+
+          <button
+            type="button"
+            className="auth-secondary-button"
+            onClick={goToForgotPassword}
+          >
+            آیا رمز عبور خود را فراموش کرده‌اید؟
           </button>
         </form>
 

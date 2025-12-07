@@ -34,10 +34,13 @@ function RegisterPage() {
     }
   };
 
+  const goToLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-card">
-        {/* 👇 لوگو بالای فرم */}
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
 
         <h1>ثبت نام</h1>
@@ -70,6 +73,14 @@ function RegisterPage() {
           />
           <button type="submit" disabled={loading}>
             {loading ? '...' : 'ثبت نام'}
+          </button>
+
+          <button
+            type="button"
+            className="auth-secondary-button"
+            onClick={goToLogin}
+          >
+            آیا قبلاً ثبت‌نام کرده‌اید؟ ورود
           </button>
         </form>
 

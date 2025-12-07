@@ -1,17 +1,35 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function HomePage() {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>خوش آمدید 🌿</h2>
-      <p>شما وارد سیستم شده‌اید.</p>
+    <div className="home-page">
+      <div className="home-card">
+        <h1>به حمایت چوب خوش آمدید</h1>
+        <p>
+          شما با موفقیت وارد شده‌اید. این صفحه فقط وقتی قابل دسترسی است
+          که کاربر توکن معتبر داشته باشد.
+        </p>
 
-      <button onClick={handleLogout}>خروج از حساب</button>
+        <div className="home-actions">
+          <button
+            onClick={() => alert('اینجا بعداً می‌تونه لیست سفارش‌ها یا محصولات باشد')}
+          >
+            مشاهده محصولات / سفارش‌ها
+          </button>
+
+          <button className="logout-btn" onClick={handleLogout}>
+            خروج از حساب
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
