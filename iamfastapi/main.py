@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime, timedelta
-
+from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -151,6 +151,8 @@ def get_current_user(
 # ================= اپ اصلی FastAPI =================
 
 app = FastAPI(title="IAM Service - FastAPI")
+
+
 
 
 @app.get("/", response_model=Message)

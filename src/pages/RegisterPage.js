@@ -24,11 +24,25 @@ function RegisterPage() {
     setMessage('');
 
     try {
-      const res = await api.post('/register', form);
+      // 👈 اینجا فقط اسم فیلدها را با Swagger یکی کن
+      const payload = {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        phone_number: form.phone, // مثلاً اگر تو Swagger نوشته phone، همین را عوض کن
+      };
+
+      const res = await api.post('/api/auth/register', payload);
       setMessage(res.data.message || 'ثبت نام انجام شد');
+
       navigate('/verify', { state: { email: form.email } });
     } catch (err) {
-      setMessage(err.response?.data?.message || 'خطا در ثبت نام');
+      const backendMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        'خطا در ثبت نام';
+      setMessage(backendMsg);
+      console.error('Register error:', err);
     } finally {
       setLoading(false);
     }
@@ -42,7 +56,6 @@ function RegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
-
         <h1>ثبت نام</h1>
 
         <form onSubmit={handleSubmit}>
@@ -71,6 +84,7 @@ function RegisterPage() {
             value={form.password}
             onChange={handleChange}
           />
+
           <button type="submit" disabled={loading}>
             {loading ? '...' : 'ثبت نام'}
           </button>

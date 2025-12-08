@@ -7,6 +7,7 @@ function VerifyPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // اگر از صفحه ثبت‌نام ایمیل فرستاده شده بود، همونو بگیر
   const emailFromState = location.state?.email || '';
   const [email, setEmail] = useState(emailFromState);
   const [code, setCode] = useState('');
@@ -19,15 +20,23 @@ function VerifyPage() {
     setMessage('');
 
     try {
-      const res = await api.post('/verify-email', { email, code });
-      setMessage(res.data.message || 'تأیید انجام شد');
+      // درخواست تأیید به Gateway
+      const res = await api.post('/api/auth/verify', { email, code });
 
-      if (res.data.token) {
-        localStorage.setItem('accessToken', res.data.token);
-        navigate('/home');
-      }
+      // پیام موفقیت از سرور
+      setMessage(res.data.message || 'حساب شما تأیید شد');
+
+      // بعد از کمی مکث، کاربر را به صفحه لاگین ببر
+      setTimeout(() => {
+        navigate('/login', { replace: true });
+      }, 1000);
     } catch (err) {
-      setMessage(err.response?.data?.message || 'خطا در تأیید');
+      // اگر خطایی از سمت سرور اومد، متن خطا رو نشون بده
+      setMessage(
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        'خطا در تأیید'
+      );
     } finally {
       setLoading(false);
     }
@@ -36,7 +45,7 @@ function VerifyPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        {/* 👇 لوگو بالای فرم */}
+        {/* لوگو بالای فرم */}
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
 
         <h1>تأیید حساب</h1>

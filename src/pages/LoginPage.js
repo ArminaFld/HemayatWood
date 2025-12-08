@@ -19,12 +19,25 @@ function LoginPage() {
     setMessage('');
 
     try {
-      const res = await api.post('/login', form);
-      localStorage.setItem('accessToken', res.data.token);
-      setMessage('ورود موفق بود');
-      navigate('/home');
+      // این مسیر را بر اساس swagger گیت‌وی تنظیم کردیم
+      const res = await api.post('/api/auth/login', form);
+
+      // هم access_token را چک می‌کنیم هم token
+      const token = res.data.access_token || res.data.token;
+
+      if (token) {
+        localStorage.setItem('accessToken', token);
+        setMessage('ورود موفق بود');
+        navigate('/home');
+      } else {
+        setMessage('توکن از سرور دریافت نشد');
+      }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'خطا در ورود');
+      setMessage(
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        'خطا در ورود'
+      );
     } finally {
       setLoading(false);
     }
@@ -32,6 +45,10 @@ function LoginPage() {
 
   const goToForgotPassword = () => {
     navigate('/verify');
+  };
+
+  const goToRegister = () => {
+    navigate('/register');
   };
 
   return (
@@ -55,6 +72,7 @@ function LoginPage() {
             value={form.password}
             onChange={handleChange}
           />
+
           <button type="submit" disabled={loading}>
             {loading ? '...' : 'ورود'}
           </button>
@@ -65,6 +83,14 @@ function LoginPage() {
             onClick={goToForgotPassword}
           >
             آیا رمز عبور خود را فراموش کرده‌اید؟
+          </button>
+
+          <button
+            type="button"
+            className="auth-secondary-button"
+            onClick={goToRegister}
+          >
+            آیا هنوز ثبت‌نام نکرده‌اید؟ ثبت‌نام
           </button>
         </form>
 

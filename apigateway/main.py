@@ -2,12 +2,22 @@ from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.responses import Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
+from fastapi.middleware.cors import CORSMiddleware
+
 import httpx
 
 # آدرس سرویس IAM که روی پورت 8000 اجرا می‌شود
 IAM_BASE_URL = "http://127.0.0.1:8000"
 
 app = FastAPI(title="API Gateway - Auth")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # برای اینکه Swagger دکمه Authorize را نشان بدهد
 bearer_scheme = HTTPBearer()

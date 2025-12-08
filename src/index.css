@@ -67,6 +67,7 @@ body {
   margin: 0 auto 24px;
   width: 160px;
 }
+
 .home-page {
   min-height: 100vh;
   display: flex;
@@ -114,6 +115,7 @@ body {
 .home-actions .logout-btn {
   background-color: #d9534f;
 }
+
 .auth-secondary-button {
   background: transparent;
   border: none;
@@ -122,15 +124,7 @@ body {
   margin-top: 0.5rem;
   cursor: pointer;
   text-decoration: underline;
-  text-align: center;
-}
-.auth-secondary-button {
-  background: transparent;
-  border: none;
-  color: #6ba06b;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  text-decoration: underline;
+  display: block;
+  width: 100%;
   text-align: center;
 }
