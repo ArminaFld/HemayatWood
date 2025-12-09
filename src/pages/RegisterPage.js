@@ -5,10 +5,9 @@ import logo from '../assets/hemayat-logo.png.png';
 
 function RegisterPage() {
   const [form, setForm] = useState({
-    phone: '',
     username: '',
     email: '',
-    password: ''
+    password: '',
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,17 +23,21 @@ function RegisterPage() {
     setMessage('');
 
     try {
-      // 👈 اینجا فقط اسم فیلدها را با Swagger یکی کن
+      // بک‌اند ما برای ثبت نام این سه فیلد را می‌خواهد
       const payload = {
         username: form.username,
         email: form.email,
         password: form.password,
-        phone_number: form.phone, // مثلاً اگر تو Swagger نوشته phone، همین را عوض کن
       };
 
       const res = await api.post('/api/auth/register', payload);
-      setMessage(res.data.message || 'ثبت نام انجام شد');
 
+      setMessage(
+        res.data.message ||
+        'ثبت نام انجام شد. لطفاً کد تأیید ۶ رقمی را وارد کنید.'
+      );
+
+      // ایمیل را برای صفحه وریفای می‌فرستیم
       navigate('/verify', { state: { email: form.email } });
     } catch (err) {
       const backendMsg =
@@ -59,12 +62,6 @@ function RegisterPage() {
         <h1>ثبت نام</h1>
 
         <form onSubmit={handleSubmit}>
-          <input
-            name="phone"
-            placeholder="شماره همراه"
-            value={form.phone}
-            onChange={handleChange}
-          />
           <input
             name="username"
             placeholder="نام کاربری"

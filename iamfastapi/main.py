@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime, timedelta
-from fastapi.middleware.cors import CORSMiddleware
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -11,7 +10,6 @@ from sqlalchemy.orm import sessionmaker, declarative_base, Session
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import random
-
 
 # ================= تنظیمات امنیتی و JWT =================
 
@@ -23,7 +21,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # برای JWT Bearer در Swagger و /auth/me
 bearer_scheme = HTTPBearer()
-
 
 # ================= تنظیمات دیتابیس (SQLite) =================
 
@@ -41,20 +38,21 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     is_verified = Column(Boolean, default=False)
-    verification_code = Column(String, nullable=True)  # 👈 کد تأیید
+    verification_code = Column(String, nullable=True)  # 👈 هم برای تأیید ایمیل هم ریست پسورد
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
 Base.metadata.create_all(bind=engine)
 
-
 # ================= مدل‌های Pydantic =================
 
 
 class UserCreate(BaseModel):
+    username: str
     email: EmailStr
     password: str
 
@@ -65,7 +63,7 @@ class UserVerify(BaseModel):
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 
@@ -76,11 +74,20 @@ class Token(BaseModel):
 
 class Message(BaseModel):
     message: str
-    verification_code: Optional[str] = None   # برای نمایش کد تأیید در دمو
+    verification_code: Optional[str] = None   # برای نمایش کد در دمو
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str
+    new_password: str
 
 
 # ================= توابع کمکی =================
-
 
 def get_db():
     db = SessionLocal()
@@ -112,14 +119,16 @@ def get_user_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email).first()
 
 
+def get_user_by_username(db: Session, username: str) -> Optional[User]:
+    return db.query(User).filter(User.username == username).first()
+
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User:
     """
-    این تابع از HTTPBearer استفاده می‌کند.
-    یعنی در هدر باید این‌طوری بفرستی:
-
+    در هدر باید این‌طوری بفرستی:
         Authorization: Bearer <access_token>
     """
     token = credentials.credentials
@@ -153,29 +162,37 @@ def get_current_user(
 app = FastAPI(title="IAM Service - FastAPI")
 
 
-
-
 @app.get("/", response_model=Message)
 def root():
     return {"message": "IAM Service is running"}
 
 
-# ----------- ثبت‌نام کاربر جدید -----------
+# ----------- ثبت‌نام کاربر جدید ----------- #
 @app.post("/auth/register", response_model=Message, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    existing = get_user_by_email(db, user_in.email)
-    if existing:
+    # چک یکتا بودن ایمیل
+    existing_email = get_user_by_email(db, user_in.email)
+    if existing_email:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="این ایمیل قبلاً ثبت شده است.",
         )
 
+    # چک یکتا بودن نام کاربری
+    existing_username = get_user_by_username(db, user_in.username)
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="این نام کاربری قبلاً ثبت شده است.",
+        )
+
     password_hash = get_password_hash(user_in.password)
 
-    # 👈 تولید کد تأیید ۶ رقمی
+    # تولید کد تأیید ۶ رقمی
     verification_code = str(random.randint(100000, 999999))
 
     new_user = User(
+        username=user_in.username,
         email=user_in.email,
         password_hash=password_hash,
         is_verified=False,
@@ -188,14 +205,13 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     # برای دمو: چاپ در ترمینال
     print(f"Verification code for {new_user.email} -> {verification_code}")
 
-    # برای دمو: برگرداندن کد در پاسخ (در عمل واقعی این کار رو نمی‌کنیم)
     return {
-        "message": "ثبت‌نام انجام شد. لطفاً کد تأیید ارسال‌شده را وارد کنید.",
+        "message": "ثبت‌نام انجام شد. لطفاً کد تأیید ۶ رقمی ارسال‌شده به ایمیل را وارد کنید.",
         "verification_code": verification_code,
     }
 
 
-# ----------- تأیید حساب کاربر -----------
+# ----------- تأیید حساب کاربر ----------- #
 @app.post("/auth/verify", response_model=Message)
 def verify(user_verify: UserVerify, db: Session = Depends(get_db)):
     user = get_user_by_email(db, user_verify.email)
@@ -217,7 +233,7 @@ def verify(user_verify: UserVerify, db: Session = Depends(get_db)):
             detail="برای این حساب کد تأیید ثبت نشده است.",
         )
 
-    # 👈 این‌جا واقعا کد رو چک می‌کنیم
+    # چک کردن کد تأیید
     if user_verify.code != user.verification_code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -231,20 +247,20 @@ def verify(user_verify: UserVerify, db: Session = Depends(get_db)):
     return {"message": "حساب شما با موفقیت تأیید شد."}
 
 
-# ----------- ورود کاربر و دریافت JWT -----------
+# ----------- ورود کاربر و دریافت JWT (با نام کاربری) ----------- #
 @app.post("/auth/login", response_model=Token)
 def login(user_login: UserLogin, db: Session = Depends(get_db)):
-    user = get_user_by_email(db, user_login.email)
+    user = get_user_by_username(db, user_login.username)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="ایمیل یا رمز عبور نادرست است.",
+            detail="نام کاربری یا رمز عبور نادرست است.",
         )
 
     if not verify_password(user_login.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="ایمیل یا رمز عبور نادرست است.",
+            detail="نام کاربری یا رمز عبور نادرست است.",
         )
 
     if not user.is_verified:
@@ -254,17 +270,81 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
         )
 
     access_token = create_access_token(
-        data={"sub": str(user.id), "email": user.email}
+        data={"sub": str(user.id), "email": user.email, "username": user.username}
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# ----------- دریافت اطلاعات کاربر فعلی -----------
+# ----------- درخواست کد برای فراموشی رمز عبور ----------- #
+@app.post("/auth/forgot-password", response_model=Message)
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = get_user_by_email(db, payload.email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="کاربری با این ایمیل پیدا نشد.",
+        )
+
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="حساب شما هنوز تأیید نشده است.",
+        )
+
+    reset_code = str(random.randint(100000, 999999))
+    user.verification_code = reset_code
+    db.commit()
+
+    print(f"Reset code for {user.email} -> {reset_code}")
+
+    return {
+        "message": "کد بازیابی رمز عبور برای شما ارسال شد.",
+        "verification_code": reset_code,  # فقط برای دمو
+    }
+
+
+# ----------- تأیید کد و تنظیم رمز عبور جدید ----------- #
+@app.post("/auth/reset-password", response_model=Message)
+def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = get_user_by_email(db, payload.email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="کاربری با این ایمیل پیدا نشد.",
+        )
+
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="حساب شما هنوز تأیید نشده است.",
+        )
+
+    if not user.verification_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="برای این کاربر کد بازیابی ثبت نشده است.",
+        )
+
+    if payload.code != user.verification_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="کد تأیید نادرست است.",
+        )
+
+    user.password_hash = get_password_hash(payload.new_password)
+    user.verification_code = None
+    db.commit()
+
+    return {"message": "رمز عبور با موفقیت تغییر کرد."}
+
+
+# ----------- دریافت اطلاعات کاربر فعلی ----------- #
 @app.get("/auth/me")
 def read_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
+        "username": current_user.username,
         "email": current_user.email,
         "is_verified": current_user.is_verified,
         "created_at": current_user.created_at,

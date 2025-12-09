@@ -1,16 +1,23 @@
+// src/pages/LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import logo from '../assets/hemayat-logo.png.png';
 
 function LoginPage() {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+  });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -19,34 +26,23 @@ function LoginPage() {
     setMessage('');
 
     try {
-      // این مسیر را بر اساس swagger گیت‌وی تنظیم کردیم
       const res = await api.post('/api/auth/login', form);
-
-      // هم access_token را چک می‌کنیم هم token
-      const token = res.data.access_token || res.data.token;
-
-      if (token) {
-        localStorage.setItem('accessToken', token);
-        setMessage('ورود موفق بود');
-        navigate('/home');
-      } else {
-        setMessage('توکن از سرور دریافت نشد');
-      }
+      localStorage.setItem('accessToken', res.data.access_token);
+      setMessage('ورود موفق بود');
+      navigate('/home');
     } catch (err) {
-      setMessage(
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        'خطا در ورود'
-      );
+      setMessage(err.response?.data?.detail || 'خطا در ورود');
     } finally {
       setLoading(false);
     }
   };
 
+  // 👉 رفتن به صفحه فراموشی رمز
   const goToForgotPassword = () => {
-    navigate('/verify');
+    navigate('/forgot-password');
   };
 
+  // 👉 رفتن به صفحه ثبت‌نام
   const goToRegister = () => {
     navigate('/register');
   };
@@ -60,9 +56,9 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <input
-            name="email"
-            placeholder="ایمیل"
-            value={form.email}
+            name="username"
+            placeholder="نام کاربری"
+            value={form.username}
             onChange={handleChange}
           />
           <input
@@ -73,10 +69,12 @@ function LoginPage() {
             onChange={handleChange}
           />
 
+          {/* دکمه اصلی ورود */}
           <button type="submit" disabled={loading}>
             {loading ? '...' : 'ورود'}
           </button>
 
+          {/* 👇 دکمه فراموشی رمز – حتماً type="button" باشد */}
           <button
             type="button"
             className="auth-secondary-button"
@@ -85,12 +83,13 @@ function LoginPage() {
             آیا رمز عبور خود را فراموش کرده‌اید؟
           </button>
 
+          {/* 👇 دکمه رفتن به ثبت‌نام */}
           <button
             type="button"
             className="auth-secondary-button"
             onClick={goToRegister}
           >
-            آیا هنوز ثبت‌نام نکرده‌اید؟ ثبت‌نام
+            هنوز ثبت‌نام نکرده‌اید؟ ثبت‌نام
           </button>
         </form>
 

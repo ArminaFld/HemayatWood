@@ -1,17 +1,14 @@
+// src/pages/ForgotPasswordPage.js
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import logo from '../assets/hemayat-logo.png.png';
 
-function VerifyPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const emailFromState = location.state?.email || '';
-  const [email, setEmail] = useState(emailFromState);
-  const [code, setCode] = useState('');
+function ForgotPasswordPage() {
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,18 +16,16 @@ function VerifyPage() {
     setMessage('');
 
     try {
-      const res = await api.post('/api/auth/verify', { email, code });
+      const res = await api.post('/api/auth/forgot-password', { email });
 
-      setMessage(res.data.message || 'حساب شما تأیید شد');
+      // اگر سرور پیامی برگرداند همان را نشان می‌دهیم، وگرنه پیام پیش‌فرض
+      setMessage(res.data.message || 'کد بازیابی برای شما ارسال شد.');
 
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 1000);
+      // بعد از موفقیت، کاربر را به صفحه‌ی تنظیم رمز جدید می‌بریم
+      navigate('/reset-password', { state: { email } });
     } catch (err) {
       setMessage(
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        'خطا در تأیید'
+        err.response?.data?.detail || 'خطا در ارسال کد بازیابی رمز عبور'
       );
     } finally {
       setLoading(false);
@@ -41,22 +36,18 @@ function VerifyPage() {
     <div className="auth-page">
       <div className="auth-card">
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
-
-        <h1>تأیید حساب</h1>
+        <h1>فراموشی رمز عبور</h1>
 
         <form onSubmit={handleSubmit}>
           <input
+            type="email"
             placeholder="ایمیل"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <input
-            placeholder="کد تأیید ۶ رقمی"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
+
           <button type="submit" disabled={loading}>
-            {loading ? '...' : 'تأیید'}
+            {loading ? '...' : 'ارسال کد بازیابی'}
           </button>
         </form>
 
@@ -66,4 +57,4 @@ function VerifyPage() {
   );
 }
 
-export default VerifyPage;
+export default ForgotPasswordPage;

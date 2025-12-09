@@ -1,15 +1,18 @@
+// src/pages/ResetPasswordPage.js
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import logo from '../assets/hemayat-logo.png.png';
 
-function VerifyPage() {
+function ResetPasswordPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // اگر از صفحه قبل ایمیل ارسال شده بود، از همان استفاده می‌کنیم
   const emailFromState = location.state?.email || '';
   const [email, setEmail] = useState(emailFromState);
   const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -19,18 +22,19 @@ function VerifyPage() {
     setMessage('');
 
     try {
-      const res = await api.post('/api/auth/verify', { email, code });
+      const res = await api.post('/api/auth/reset-password', {
+        email,
+        code,
+        new_password: newPassword,
+      });
 
-      setMessage(res.data.message || 'حساب شما تأیید شد');
+      setMessage(res.data.message || 'رمز عبور با موفقیت تغییر کرد.');
 
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 1000);
+      // بعد از موفقیت، کاربر را به صفحه‌ی لاگین می‌بریم
+      navigate('/login');
     } catch (err) {
       setMessage(
-        err.response?.data?.detail ||
-        err.response?.data?.message ||
-        'خطا در تأیید'
+        err.response?.data?.detail || 'خطا در تغییر رمز عبور'
       );
     } finally {
       setLoading(false);
@@ -41,22 +45,31 @@ function VerifyPage() {
     <div className="auth-page">
       <div className="auth-card">
         <img src={logo} alt="Hemayat Wood Logo" className="auth-logo" />
-
-        <h1>تأیید حساب</h1>
+        <h1>تنظیم رمز جدید</h1>
 
         <form onSubmit={handleSubmit}>
           <input
+            type="email"
             placeholder="ایمیل"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+
           <input
-            placeholder="کد تأیید ۶ رقمی"
+            placeholder="کد ۶ رقمی"
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
+
+          <input
+            type="password"
+            placeholder="رمز عبور جدید"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
           <button type="submit" disabled={loading}>
-            {loading ? '...' : 'تأیید'}
+            {loading ? '...' : 'تأیید و تغییر رمز'}
           </button>
         </form>
 
@@ -66,4 +79,4 @@ function VerifyPage() {
   );
 }
 
-export default VerifyPage;
+export default ResetPasswordPage;
