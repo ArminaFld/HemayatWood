@@ -17,7 +17,8 @@ SECRET_KEY = "super_secret_key_change_me"   # فقط برای دمو
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# استفاده از argon2 به جای bcrypt
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # برای JWT Bearer در Swagger و /auth/me
 bearer_scheme = HTTPBearer()
@@ -85,6 +86,10 @@ class ResetPasswordRequest(BaseModel):
     email: EmailStr
     code: str
     new_password: str
+
+class GoogleLoginRequest(BaseModel):
+    email: EmailStr
+
 
 
 # ================= توابع کمکی =================
