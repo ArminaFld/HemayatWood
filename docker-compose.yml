@@ -1,0 +1,40 @@
+services:
+  iam:
+    build: ./iamfastapi
+    ports:
+      - "8000:8000"
+    networks:
+      - hemayatwood
+
+  media:
+    build: ./mediaservice
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./mediaservice/uploads:/app/uploads
+    networks:
+      - hemayatwood
+
+  core:
+    build: ./coreservice
+    ports:
+      - "8001:8001"
+    networks:
+      - hemayatwood
+
+  gateway:
+    build: ./apigateway
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    depends_on:
+      - iam
+      - media
+      - core
+    networks:
+      - hemayatwood
+
+networks:
+  hemayatwood:
+    driver: bridge

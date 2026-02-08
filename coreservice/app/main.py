@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from coreservice.routers import auth
+from app.routers import auth
+from app.routers import items
 
+app = FastAPI(title="Core Service")
 
-app = FastAPI()
-
-# مسیرهای مربوط به احراز هویت
 app.include_router(auth.router)
+app.include_router(items.router)
 
 @app.get("/")
-def read_root():
+def root():
     return {"message": "Core Service is running"}
