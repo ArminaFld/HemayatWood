@@ -5,27 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7f0f67b-3836-47d9-b058-07285fad02a1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/apigateway/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apigateway/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/app/routers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/app/routers/items.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/core/auth_client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/coreservice/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/iamfastapi/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/iamfastapi/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mediaservice/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mediaservice/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wood-frontend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wood-frontend.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/coreservice/db/models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/iamfastapi/auth.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apigateway/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/apigateway/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/coreservice/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/app/routers/items.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/app/routers/items.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/core/auth_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/core/auth_client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/coreservice/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/core/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/coreservice/core/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/core/security.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/coreservice/routers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/coreservice/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/app/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/db/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/db/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/db/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/db/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/coreservice/db/session.py" beforeDir="false" afterPath="$PROJECT_DIR$/coreservice/db/session.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iamfastapi/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/iamfastapi/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iamfastapi/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/iamfastapi/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

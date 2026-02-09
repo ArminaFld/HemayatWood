@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 sqlalchemy
 python-jose
-passlib[bcrypt]
-pydantic[email]
-email-validator
+passlib
 argon2-cffi
+email-validator
+pydantic[email]

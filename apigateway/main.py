@@ -63,10 +63,6 @@ async def root():
     return {"message": "API Gateway is running"}
 
 
-# -------------------------
-# IAM (Auth) proxy endpoints
-# -------------------------
-
 @app.post("/api/auth/register")
 async def gateway_register(user_in: UserCreate):
     async with httpx.AsyncClient() as client:
@@ -127,11 +123,6 @@ async def gateway_me(credentials: HTTPAuthorizationCredentials = Depends(bearer_
         )
     return await proxy_response(resp)
 
-
-# -------------------------
-# Media proxy endpoints
-# -------------------------
-
 @app.post("/api/media/upload/")
 async def gateway_upload_file(file: UploadFile = File(...)):
     async with httpx.AsyncClient() as client:
@@ -163,12 +154,6 @@ async def gateway_delete_file(filename: str):
     if resp.status_code == 200:
         return resp.json()
     raise HTTPException(status_code=resp.status_code, detail="File not found")
-
-
-# -------------------------
-# CoreService proxy endpoints
-# (تا توی Swagger گیت‌وی دیده بشن)
-# -------------------------
 
 @app.get("/api/core/ping")
 async def gateway_core_ping():
